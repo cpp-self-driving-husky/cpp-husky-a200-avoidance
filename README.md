@@ -24,7 +24,10 @@ The present solution for now is to use and modify the Husky A200's existing LiDA
 ## Data
 
 LiDAR: Sensor that measures the distance from a pulsed laser light to its surroundings.
+
 LiDAR sensor on Husky A200: [SICK LMS151](https://www.sick.com/us/en/detection-and-ranging-solutions/2d-lidar-sensors/lms1xx/lms151-10100/p/p141840)
+
+
 [ROS Documentation for LMS151](http://wiki.ros.org/LMS1xx)
 * Node: LMS100
 * Topic: [scan(sensor_msgs/LaserScan)](http://docs.ros.org/api/sensor_msgs/html/msg/LaserScan.html) - contains the LiDAR's data
