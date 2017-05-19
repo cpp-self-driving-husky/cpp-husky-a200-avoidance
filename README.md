@@ -21,8 +21,18 @@ This document covers obstacle avoidance specified in [Cal Poly Pomona's Self Dri
 
 The present solution for now is to use and modify the Husky A200's existing LiDAR-based obstacle avoidance code and test it through simulation software. As  the project progresses, incorporation of other sensor data (e.g. stereo vision, sonar) can be compiled along with the LiDAR data via sensor fusion. This would provide a more accurate data input to sense potential obstacles in the Husky A200's path.
 
+## Data
+
+LiDAR: Sensor that measures the distance from a pulsed laser light to its surroundings.
+LiDAR sensor on Husky A200: [SICK LMS151](https://www.sick.com/us/en/detection-and-ranging-solutions/2d-lidar-sensors/lms1xx/lms151-10100/p/p141840)
+[ROS Documentation for LMS151](http://wiki.ros.org/LMS1xx)
+* Node: LMS100
+* Topic: [scan(sensor_msgs/LaserScan)](http://docs.ros.org/api/sensor_msgs/html/msg/LaserScan.html) - contains the LiDAR's data
+  * ranges[] - distance of an object in meters (needs more research)
+  * intensities[] - strength of reflected light from an object, used to create a 2D map of the area
+
 ## Reference
 
-1. [LiDAR-based obstacle avoidance](http://ieeexplore.ieee.org/abstract/document/6083105/?reload=true&part=1)
+1. [LiDAR-based obstacle avoidance](http://ieeexplore.ieee.org.proxy.library.cpp.edu/document/7279550/?reload=true)
 2. [Stereo vision-based obstacle avoidance](http://www.roboken.iit.tsukuba.ac.jp/~ohya/pdf/ISRA2000-MSK.pdf)
 3. [Sonar and LiDAR-based obstacle avoidance comparison](http://ceas.uc.edu/content/dam/ceas/documents/UC%20Center%20for%20Robotics%20Research/robpub60.pdf)
