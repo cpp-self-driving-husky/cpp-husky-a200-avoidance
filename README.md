@@ -19,7 +19,9 @@ This document covers obstacle avoidance specified in [Cal Poly Pomona's Self Dri
 
 ## Solution
 
-The present solution for now is to use and modify the Husky A200's existing LiDAR-based obstacle avoidance code and test it through simulation software. As  the project progresses, incorporation of other sensor data (e.g. stereo vision, sonar) can be compiled along with the LiDAR data via sensor fusion. This would provide a more accurate data input to sense potential obstacles in the Husky A200's path.
+The present solution for now is to use and modify the Husky A200's existing LiDAR-based obstacle avoidance code and test it through simulation software. As  the project progresses, incorporation of other sensor data (e.g. stereo vision, sonar) can be compiled along with the LiDAR data via sensor fusion. (See design diagram below). This would provide a more accurate data input to sense potential obstacles in the Husky A200's path.
+
+![Obstacle Avoidance Design Diagram](https://www.draw.io/?lightbox=1&highlight=0000ff&edit=_blank&layers=1&nav=1&title=ObstacleAvoidance.html#Uhttps%3A%2F%2Fdrive.google.com%2Fuc%3Fid%3D0B-oOJ2YMqwtvM3hpVXUyaGk3d28%26export%3Ddownload)
 
 ## Data
 
@@ -31,8 +33,13 @@ LiDAR sensor on Husky A200: [SICK LMS151](https://www.sick.com/us/en/detection-a
 [ROS Documentation for LMS151](http://wiki.ros.org/LMS1xx)
 * Node: LMS100
 * Topic: [scan(sensor_msgs/LaserScan)](http://docs.ros.org/api/sensor_msgs/html/msg/LaserScan.html) - contains the LiDAR's data
-  * ranges[] - distance of an object in meters (needs more research)
-  * intensities[] - strength of reflected light from an object, used to create a 2D map of the area
+  * angle_min: start angle of the scan (-2.356 radians = -135 degrees)
+  * angle_max: end angle of the scan (+2.356 radians = +135 degrees)
+  * angle_increment: angular distance between measurements (0.00872 radians = 0.5 degrees)
+  * range_min: minimum range value (0.0099999 meters)
+  * range_max: maximum range value (20.0 meters)
+  * ranges: distance in meters away an object is based on the time it takes for the light to hit the object and bounce back, used to create a 2D map of surrounding area
+  * intensities: strength of reflected light from an object
 
 ## Reference
 
