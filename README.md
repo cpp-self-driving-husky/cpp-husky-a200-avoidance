@@ -21,7 +21,7 @@ This document covers obstacle avoidance specified in [Cal Poly Pomona's Self Dri
 
 The present solution for now is to use and modify the Husky A200's existing LiDAR-based obstacle avoidance code and test it through simulation software. As  the project progresses, incorporation of other sensor data (e.g. stereo vision, sonar) can be compiled along with the LiDAR data via sensor fusion. (See design diagram below). This would provide a more accurate data input to sense potential obstacles in the Husky A200's path.
 
-![Obstacle Avoidance Design Diagram](https://www.draw.io/?lightbox=1&highlight=0000ff&edit=_blank&layers=1&nav=1&title=ObstacleAvoidance.html#Uhttps%3A%2F%2Fdrive.google.com%2Fuc%3Fid%3D0B-oOJ2YMqwtvM3hpVXUyaGk3d28%26export%3Ddownload)
+![Obstacle Avoidance Design Diagram](images/ObstacleAvoidance.png)
 
 ## Data
 
