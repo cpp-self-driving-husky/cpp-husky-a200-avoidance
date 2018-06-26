@@ -10,6 +10,7 @@
 #define DISTANCE 3
 #define NEW_LINEARX 0.3
 #define TURN_ANGULAR_SPEED 2
+#define MINIMUM_DISTANCE_THRESHOLD 0.1//how sensitive LiDAR is to small distance values (DEFAULT: 0.1)
 
 ros::Publisher pub;
 
@@ -20,7 +21,7 @@ float min_element(std::vector<float> first){
 	float min=50.0;
 
 	for (std::vector<float>::iterator it = first.begin(); it<first.end();it++){
-		if (*it<min && *it> 0.1){
+		if (*it<min && *it> MINIMUM_DISTANCE_THRESHOLD){
 			min = *it;
 		}
 	}
