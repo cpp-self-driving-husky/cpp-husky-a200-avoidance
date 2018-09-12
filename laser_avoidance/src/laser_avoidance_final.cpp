@@ -5,11 +5,11 @@
 #include <string>
 
 //Change these constants for vehicle kinematics
-#define DEFAULT_LINEAR 0.1
-#define DEFAULT_ANGULAR 0
-#define DISTANCE 3
-#define NEW_LINEARX 0.3
-#define TURN_ANGULAR_SPEED 2
+#define DEFAULT_LINEAR 0.1			//LINEAR SPEED for no obstacle detected
+#define DEFAULT_ANGULAR 0				//ANGULAR SPEED (Turn)
+#define DISTANCE 3							//Maximum distance to consider point an obstacle
+#define NEW_LINEARX 0.3					//
+#define TURN_ANGULAR_SPEED 2		//Turn speed
 #define MINIMUM_DISTANCE_THRESHOLD 0.1//how sensitive LiDAR is to small distance values (DEFAULT: 0.1)
 
 ros::Publisher pub;
@@ -34,8 +34,8 @@ float min_element(std::vector<float> first){
 void computeDirection(float left, float frontLeft, float front, float frontRight, float right){
 
 		geometry_msgs::Twist message;
-		linearx = DEFAULT_LINEAR;
-		angularz = DEFAULT_ANGULAR;
+		float linearx = DEFAULT_LINEAR;
+		float angularz = DEFAULT_ANGULAR;
 		std::string case_description;
 
 		//If no obstacles is within DISTANCE, then proceed forward.
