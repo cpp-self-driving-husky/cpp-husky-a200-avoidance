@@ -33,66 +33,66 @@ float min_element(std::vector<float> first){
 //Function publishes a message with new direction, linear, and angular velocity.
 void computeDirection(float left, float frontLeft, float front, float frontRight, float right){
 
-	geometry_msgs::Twist message;
-	linearx = DEFAULT_LINEAR;
-	angularz = DEFAULT_ANGULAR;
-	std::string case_description;
+		geometry_msgs::Twist message;
+		linearx = DEFAULT_LINEAR;
+		angularz = DEFAULT_ANGULAR;
+		std::string case_description;
 
-	//If no obstacles is within DISTANCE, then proceed forward.
-	if(front>DISTANCE && frontLeft > DISTANCE && frontRight >DISTANCE){
-		case_description = "Case 1: No Obstacle Detected";
-		linearx = NEW_LINEARX;
-		angularz = 0;
-	}
+		//If no obstacles is within DISTANCE, then proceed forward.
+		if(front>DISTANCE && frontLeft > DISTANCE && frontRight >DISTANCE){
+						case_description = "Case 1: No Obstacle Detected";
+						linearx = NEW_LINEARX;
+						angularz = 0;
+		}
 
-	//If obstacle is detected in front within DISTANCE, then turn.
-	else if(front <DISTANCE && frontLeft>DISTANCE && frontRight>DISTANCE){
-		case_description = "Case 2: Object in front.";
-		linearx = 0;
-		angularz= TURN_ANGULAR_SPEED;
-	}
-	else if(front >DISTANCE && frontLeft>DISTANCE && frontRight<DISTANCE){
-		case_description = "Case 3: Object in front right area.";
-	    	linearx = 0;
-	    	angularz= TURN_ANGULAR_SPEED;
-	}
-	else if(front >DISTANCE && frontLeft<DISTANCE && frontRight>DISTANCE){
-	    	case_description = "Case 4: Object in front left area.";
-	    	linearx = 0;
-	    	angularz= -TURN_ANGULAR_SPEED;
-	}
-    	else if(front <DISTANCE && frontLeft>DISTANCE && frontRight<DISTANCE){
-          	case_description = "Case 5: Object in front and front right areas.";
-        	linearx = 0;
-        	angularz= TURN_ANGULAR_SPEED;
-  	}
-    	else if(front <DISTANCE && frontLeft<DISTANCE && frontRight>DISTANCE){
-        	case_description = "Case 6: Object in front and front left areas.";
-        	linearx = 0;
-        	angularz= -TURN_ANGULAR_SPEED;
-   	}
-    	else if(front <DISTANCE && frontLeft<DISTANCE && frontRight<DISTANCE){
-            	case_description = "Case 7: Object in front, front left, and front right areas.";
-            	linearx = 0;
-            	angularz= TURN_ANGULAR_SPEED;
-    	}
-	else if(front >DISTANCE && frontLeft<DISTANCE && frontRight<DISTANCE){
-            	case_description = "Case 8: Object in front left and front right.";
-            	linearx = NEW_LINEARX;
-            	angularz = 0;
-    	}
-	else{
-		case_description = "Unknown case";
-	}
+		//If obstacle is detected in front within DISTANCE, then turn.
+		else if(front <DISTANCE && frontLeft>DISTANCE && frontRight>DISTANCE){
+						case_description = "Case 2: Object in front.";
+						linearx = 0;
+						angularz= TURN_ANGULAR_SPEED;
+		}
+	  else if(front >DISTANCE && frontLeft>DISTANCE && frontRight<DISTANCE){
+	    			case_description = "Case 3: Object in front right area.";
+	    			linearx = 0;
+	    			angularz= TURN_ANGULAR_SPEED;
+	  }
+	  else if(front >DISTANCE && frontLeft<DISTANCE && frontRight>DISTANCE){
+	    			case_description = "Case 4: Object in front left area.";
+	    			linearx = 0;
+	    			angularz= -TURN_ANGULAR_SPEED;
+		}
+    else if(front <DISTANCE && frontLeft>DISTANCE && frontRight<DISTANCE){
+            case_description = "Case 5: Object in front and front right areas.";
+            linearx = 0;
+            angularz= TURN_ANGULAR_SPEED;
+    }
+    else if(front <DISTANCE && frontLeft<DISTANCE && frontRight>DISTANCE){
+            case_description = "Case 6: Object in front and front left areas.";
+            linearx = 0;
+            angularz= -TURN_ANGULAR_SPEED;
+    }
+    else if(front <DISTANCE && frontLeft<DISTANCE && frontRight<DISTANCE){
+            case_description = "Case 7: Object in front, front left, and front right areas.";
+            linearx = 0;
+            angularz= TURN_ANGULAR_SPEED;
+    }
+		else if(front >DISTANCE && frontLeft<DISTANCE && frontRight<DISTANCE){
+            case_description = "Case 8: Object in front left and front right.";
+            linearx = NEW_LINEARX;
+            angularz = 0;
+    }
+		else{
+						case_description = "Unknown case";
+		}
 
 
-//	ROS_INFO("MINLEFT: %f", frontLeft);
-//	ROS_INFO("MINFRONT: %f", front);
-//	ROS_INFO("MINRIGHT: %f", frontRight);
-	ROS_INFO("%s",case_description.c_str());
-	message.linear.x = linearx;
-	message.angular.z = angularz;
-	pub.publish(message);
+//		ROS_INFO("MINLEFT: %f", frontLeft);
+//		ROS_INFO("MINFRONT: %f", front);
+//		ROS_INFO("MINRIGHT: %f", frontRight);
+		ROS_INFO("%s",case_description.c_str());
+		message.linear.x = linearx;
+		message.angular.z = angularz;
+		pub.publish(message);
 
 }
 
@@ -153,4 +153,3 @@ int main(int argc , char **argv) {
 	ros::spin();
 	return 0;
 }
-
