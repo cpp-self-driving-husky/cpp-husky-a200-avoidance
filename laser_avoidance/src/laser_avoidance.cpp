@@ -5,11 +5,11 @@
 #include <string>
 
 //Change these constants for vehicle kinematics
-#define DEFAULT_LINEAR 0.1
-#define DEFAULT_ANGULAR 0
-#define DISTANCE 3
-#define NEW_LINEARX 0.3
-#define TURN_ANGULAR_SPEED 2
+#define DEFAULT_LINEAR 0.1			//LINEAR SPEED for no obstacle detected
+#define DEFAULT_ANGULAR 0				//ANGULAR SPEED (Turn)
+#define DISTANCE 3							//Maximum distance to consider point an obstacle
+#define NEW_LINEARX 0.3					//
+#define TURN_ANGULAR_SPEED 2		//Turn speed
 #define MINIMUM_DISTANCE_THRESHOLD 0.1//how sensitive LiDAR is to small distance values (DEFAULT: 0.1)
 
 ros::Publisher pub;
@@ -19,7 +19,6 @@ ros::Publisher pub;
 // the minimum distance to the closest obstacle in the given partition of sensor.
 float min_element(std::vector<float> first){
 	float min=50.0;
-<<<<<<< HEAD
 
 	for (std::vector<float>::iterator it = first.begin(); it<first.end();it++){
 		if (*it<min && *it> MINIMUM_DISTANCE_THRESHOLD){
@@ -35,8 +34,8 @@ float min_element(std::vector<float> first){
 void computeDirection(float left, float frontLeft, float front, float frontRight, float right){
 
 		geometry_msgs::Twist message;
-		linearx = DEFAULT_LINEAR;
-		angularz = DEFAULT_ANGULAR;
+		float linearx = DEFAULT_LINEAR;
+		float angularz = DEFAULT_ANGULAR;
 		std::string case_description;
 
 		//If no obstacles is within DISTANCE, then proceed forward.
@@ -94,82 +93,6 @@ void computeDirection(float left, float frontLeft, float front, float frontRight
 		message.linear.x = linearx;
 		message.angular.z = angularz;
 		pub.publish(message);
-=======
-
-	for (std::vector<float>::iterator it = first.begin(); it<first.end();it++){
-		if (*it<min && *it> MINIMUM_DISTANCE_THRESHOLD){
-			min = *it;
-		}
-	}
-	return min;
-}
-
-//HELPER FUNCTION
-//PURPOSE: Compute the direction based on where an obstacle is detected.
-//Function publishes a message with new direction, linear, and angular velocity.
-void computeDirection(float left, float frontLeft, float front, float frontRight, float right){
-
-	geometry_msgs::Twist message;
-	linearx = DEFAULT_LINEAR;
-	angularz = DEFAULT_ANGULAR;
-	std::string case_description;
-
-	//If no obstacles is within DISTANCE, then proceed forward.
-	if(front>DISTANCE && frontLeft > DISTANCE && frontRight >DISTANCE){
-		case_description = "Case 1: No Obstacle Detected";
-		linearx = NEW_LINEARX;
-		angularz = 0;
-	}
-
-	//If obstacle is detected in front within DISTANCE, then turn.
-	else if(front <DISTANCE && frontLeft>DISTANCE && frontRight>DISTANCE){
-		case_description = "Case 2: Object in front.";
-		linearx = 0;
-		angularz= TURN_ANGULAR_SPEED;
-	}
-	else if(front >DISTANCE && frontLeft>DISTANCE && frontRight<DISTANCE){
-		case_description = "Case 3: Object in front right area.";
-	    	linearx = 0;
-	    	angularz= TURN_ANGULAR_SPEED;
-	}
-	else if(front >DISTANCE && frontLeft<DISTANCE && frontRight>DISTANCE){
-	    	case_description = "Case 4: Object in front left area.";
-	    	linearx = 0;
-	    	angularz= -TURN_ANGULAR_SPEED;
-	}
-    	else if(front <DISTANCE && frontLeft>DISTANCE && frontRight<DISTANCE){
-          	case_description = "Case 5: Object in front and front right areas.";
-        	linearx = 0;
-        	angularz= TURN_ANGULAR_SPEED;
-  	}
-    	else if(front <DISTANCE && frontLeft<DISTANCE && frontRight>DISTANCE){
-        	case_description = "Case 6: Object in front and front left areas.";
-        	linearx = 0;
-        	angularz= -TURN_ANGULAR_SPEED;
-   	}
-    	else if(front <DISTANCE && frontLeft<DISTANCE && frontRight<DISTANCE){
-            	case_description = "Case 7: Object in front, front left, and front right areas.";
-            	linearx = 0;
-            	angularz= TURN_ANGULAR_SPEED;
-    	}
-	else if(front >DISTANCE && frontLeft<DISTANCE && frontRight<DISTANCE){
-            	case_description = "Case 8: Object in front left and front right.";
-            	linearx = NEW_LINEARX;
-            	angularz = 0;
-    	}
-	else{
-		case_description = "Unknown case";
-	}
-
-
-//	ROS_INFO("MINLEFT: %f", frontLeft);
-//	ROS_INFO("MINFRONT: %f", front);
-//	ROS_INFO("MINRIGHT: %f", frontRight);
-	ROS_INFO("%s",case_description.c_str());
-	message.linear.x = linearx;
-	message.angular.z = angularz;
-	pub.publish(message);
->>>>>>> b771c122b52bf136bf0b262c3be7db5b4134f984
 
 }
 
@@ -230,4 +153,3 @@ int main(int argc , char **argv) {
 	ros::spin();
 	return 0;
 }
-
