@@ -7,8 +7,8 @@
 //Change these constants for vehicle kinematics
 #define DEFAULT_LINEAR 0.1	     //LINEAR SPEED for no obstacle detected
 #define DEFAULT_ANGULAR 0	      //ANGULAR SPEED (Turn)
-#define DISTANCE 3		       //Maximum distance to consider point an obstacle
-#define NEW_LINEARX 0.3		       //
+#define DISTANCE 1.5		       //Maximum distance to consider point an obstacle
+#define NEW_LINEARX 0.1		       //
 #define TURN_ANGULAR_SPEED 0.5	   //Turn speed
 #define MINIMUM_DISTANCE_THRESHOLD 0.1 //how sensitive LiDAR is to small distance values (DEFAULT: 0.1)
 #define BACK_ANGLE_PROPORTION_THRESHOLD 0.24 //0.24 = 60 deg / 270 , 0.33 = 90 deg / 270
@@ -76,10 +76,15 @@ void computeDirection(float backLeft, float front, float backRight)
 	}
 	else if (!objectFront && objectBackLeft && objectBackRight)
 	{
-		case_description = "Case 3: Object in front right area.";
+		case_description = "Case 5: Object in backLeft and backRight.";
 		linearx = NEW_LINEARX;
 		angularz = 0;
 	}	
+	else if (objectFront && objectBackLeft && objectBackRight){
+		case_description = "Case 3: Object in all directions...";
+		linearx = 0;
+		angularz = 1.5*TURN_ANGULAR_SPEED;
+	}
 	else
 	{
 		case_description = "Unknown case";
