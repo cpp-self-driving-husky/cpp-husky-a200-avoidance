@@ -45,6 +45,7 @@ void computeDirection(float backLeft, float front, float backRight)
 	float angularz = DEFAULT_ANGULAR;
 	std::string case_description;
 
+	//Determine location of obstacle with respect to partitions
 	bool objectFront = (front < DISTANCE);
 	bool objectBackLeft = (backLeft < DISTANCE);
 	bool objectBackRight = (backRight < DISTANCE);
@@ -81,7 +82,7 @@ void computeDirection(float backLeft, float front, float backRight)
 		angularz = 0;
 	}	
 	else if (objectFront && objectBackLeft && objectBackRight){
-		case_description = "Case 3: Object in all directions...";
+		case_description = "Case 6: Object in all directions...";
 		linearx = 0;
 		angularz = 1.5*TURN_ANGULAR_SPEED;
 	}
@@ -90,15 +91,17 @@ void computeDirection(float backLeft, float front, float backRight)
 		case_description = "Unknown case";
 	}
 
+	//Output the case description
 	ROS_INFO("%s", case_description.c_str());
 	message.linear.x = linearx;
 	message.angular.z = angularz;
+
+	//Publish the message
 	pub.publish(message);
 }
 
-//Callback Function To Process Lidar Data and Partition Into 5 Arrays:
-//Left, FrontLeft, Front, FrontRight, and Right
-//720 total laser scans divided by 5 = 144 scans for each partition.
+//Callback Function To Process Lidar Data and Partition Into 3 Collections
+//BackLeft, Front, and BackRight: Degrees of freedom can be specified with the BACK_ANGLE_PROPORTION_THRESHOLD variable.
 //Introduce clustering algorithm that passes angle ranges of detected obstacles...
 void laserCallback(const sensor_msgs::LaserScan::ConstPtr &msg)
 {
