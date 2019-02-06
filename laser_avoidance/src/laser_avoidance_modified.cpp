@@ -111,19 +111,19 @@ void laserCallback(const sensor_msgs::LaserScan::ConstPtr &msg)
 		backLeft.push_back(msg->ranges[i]);
 	}
 
-	float minBackLeft = min_element(left);
+	float minBackLeft = min_element(backLeft);
 
 	for (int i = leftLimit; i < rightLimit; i++)
 	{
 		front.push_back(msg->ranges[i]);
 	}
-	float minFront = min_element(frontLeft);
+	float minFront = min_element(front);
 
 	for (int i = rightLimit; i < size - 1; i++)
 	{
 		backRight.push_back(msg->ranges[i]);
 	}
-	float minBackRight = min_element(front);
+	float minBackRight = min_element(backRight);
 
 
 	computeDirection(minBackLeft, minFront, minBackRight);
