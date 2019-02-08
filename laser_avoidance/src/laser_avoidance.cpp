@@ -5,12 +5,14 @@
 #include <string>
 
 //Change these constants for vehicle kinematics
-#define DEFAULT_LINEAR 0.1	     //LINEAR SPEED for no obstacle detected
+#define DEFAULT_LINEAR 0.3	     //LINEAR SPEED for no obstacle detected
 #define DEFAULT_ANGULAR 0	      //ANGULAR SPEED (Turn)
-#define DISTANCE 3		       //Maximum distance to consider point an obstacle
-#define NEW_LINEARX 0.3		       //
-#define TURN_ANGULAR_SPEED 0.5	   //Turn speed
+#define DISTANCE 1.5		       //Maximum distance to consider point an obstacle
+#define NEW_LINEARX 0.3	       //
+#define TURN_ANGULAR_SPEED 0.75	   //Turn speed
 #define MINIMUM_DISTANCE_THRESHOLD 0.1 //how sensitive LiDAR is to small distance values (DEFAULT: 0.1)
+#define BACK_ANGLE_PROPORTION_THRESHOLD 0.33 //0.24 = 60 deg / 270 , 0.33 = 90 deg / 270
+
 
 ros::Publisher pub;
 
@@ -34,7 +36,8 @@ float min_element(std::vector<float> first)
 //HELPER FUNCTION
 //PURPOSE: Compute the direction based on where an obstacle is detected.
 //Function publishes a message with new direction, linear, and angular velocity.
-void computeDirection(float left, float frontLeft, float front, float frontRight, float right)
+//IDEA: New angle can be dependent on how close the object is (inverse sigmoid)
+void computeDirection(float backLeft, float front, float backRight)
 {
 
 	geometry_msgs::Twist message;
@@ -42,60 +45,46 @@ void computeDirection(float left, float frontLeft, float front, float frontRight
 	float angularz = DEFAULT_ANGULAR;
 	std::string case_description;
 
+	bool objectFront = (front < DISTANCE);
+	bool objectBackLeft = (backLeft < DISTANCE);
+	bool objectBackRight = (backRight < DISTANCE);
+
 	//If no obstacles is within DISTANCE, then proceed forward.
-	if (front > DISTANCE && frontLeft > DISTANCE && frontRight > DISTANCE)
+	//LEFT = -TurnAngular
+	//Right = +TurnAngular
+	if (!objectFront && !objectBackLeft && !objectBackRight)
 	{
 		case_description = "Case 1: No Obstacle Detected";
 		linearx = NEW_LINEARX;
 		angularz = 0;
 	}
-
-	//If obstacle is detected in front within DISTANCE, then turn.
-	else if (front < DISTANCE && frontLeft > DISTANCE && frontRight > DISTANCE)
+	else if (objectFront && !objectBackLeft && !objectBackRight)
 	{
 		case_description = "Case 2: Object in front.";
 		linearx = 0;
 		angularz = TURN_ANGULAR_SPEED;
 	}
-	else if (front > DISTANCE && frontLeft > DISTANCE && frontRight < DISTANCE)
+	else if (objectFront && objectBackLeft && !objectBackRight){
+		case_description = "Case 3: Object in backLeft and front.";
+		linearx = 0;
+		angularz = -TURN_ANGULAR_SPEED;
+	}
+	else if (objectFront && !objectBackLeft && objectBackRight){
+		case_description = "Case 4: Object in backRight and front";
+		linearx = 0;
+		angularz = TURN_ANGULAR_SPEED;
+	}
+	else if (!objectFront && objectBackLeft && objectBackRight)
 	{
 		case_description = "Case 3: Object in front right area.";
-		linearx = 0;
-		angularz = TURN_ANGULAR_SPEED;
-	}
-	else if (front > DISTANCE && frontLeft < DISTANCE && frontRight > DISTANCE)
-	{
-		case_description = "Case 4: Object in front left area.";
-		linearx = 0;
-		angularz = -TURN_ANGULAR_SPEED;
-	}
-	else if (front < DISTANCE && frontLeft > DISTANCE && frontRight < DISTANCE)
-	{
-		case_description = "Case 5: Object in front and front right areas.";
-		linearx = 0;
-		angularz = TURN_ANGULAR_SPEED;
-	}
-	else if (front < DISTANCE && frontLeft < DISTANCE && frontRight > DISTANCE)
-	{
-		case_description = "Case 6: Object in front and front left areas.";
-		linearx = 0;
-		angularz = -TURN_ANGULAR_SPEED;
-	}
-	else if (front < DISTANCE && frontLeft < DISTANCE && frontRight < DISTANCE)
-	{
-		case_description = "Case 7: Object in front, front left, and front right areas.";
-		linearx = 0;
-		angularz = TURN_ANGULAR_SPEED;
-	}
-	else if (front > DISTANCE && frontLeft < DISTANCE && frontRight < DISTANCE)
-	{
-		case_description = "Case 8: Object in front left and front right.";
 		linearx = NEW_LINEARX;
 		angularz = 0;
-	}
-	else
+	}	
+	else if (objectFront && objectBackLeft && objectBackRight)
 	{
 		case_description = "Unknown case";
+		linearx = 0;
+		angularz = 1.5*TURN_ANGULAR_SPEED;
 	}
 
 	ROS_INFO("%s", case_description.c_str());
@@ -107,50 +96,45 @@ void computeDirection(float left, float frontLeft, float front, float frontRight
 //Callback Function To Process Lidar Data and Partition Into 5 Arrays:
 //Left, FrontLeft, Front, FrontRight, and Right
 //720 total laser scans divided by 5 = 144 scans for each partition.
+//Introduce clustering algorithm that passes angle ranges of detected obstacles...
 void laserCallback(const sensor_msgs::LaserScan::ConstPtr &msg)
 {
 
-	ROS_INFO("MINRANGE: %f", msg->range_min);
-	std::vector<float> left, frontLeft, front, frontRight, right;
+	//ROS_INFO("MINRANGE: %f", msg->range_min);
+	std::vector<float> backLeft, front, backRight;
 
-	for (int i = 0; i < 64; i++)
+	int size = msg->ranges.size();
+	int leftLimit, rightLimit;
+	leftLimit = BACK_ANGLE_PROPORTION_THRESHOLD * size;
+	rightLimit = size - leftLimit;
+
+	for (int i = 0; i <= leftLimit; i++)
 	{
-		left.push_back(msg->ranges[i]);
+		backLeft.push_back(msg->ranges[i]);
 	}
 
-	float minLeft = min_element(left);
+	float minBackLeft = min_element(backLeft);
 
-	for (int i = 144; i < 288; i++)
-	{
-		frontLeft.push_back(msg->ranges[i]);
-	}
-	float minFrontLeft = min_element(frontLeft);
-
-	for (int i = 288; i < 432; i++)
+	for (int i = leftLimit; i < rightLimit; i++)
 	{
 		front.push_back(msg->ranges[i]);
 	}
 	float minFront = min_element(front);
 
-	for (int i = 432; i < 576; i++)
+	for (int i = rightLimit; i < size - 1; i++)
 	{
-		frontRight.push_back(msg->ranges[i]);
+		backRight.push_back(msg->ranges[i]);
 	}
-	float minFrontRight = min_element(frontRight);
+	float minBackRight = min_element(backRight);
 
-	for (int i = 576; i < right.size() - 1; i++)
-	{
-		right.push_back(msg->ranges[i]);
-	}
-	float minRight = min_element(right);
 
-	computeDirection(minLeft, minFrontLeft, minFront, minFrontRight, minRight);
+	computeDirection(minBackLeft, minFront, minBackRight);
 
-	ROS_INFO("min range on left: %f", minLeft);
-	ROS_INFO("min range on frontleft: %f", minFrontLeft);
+	ROS_INFO("SIZE: %d", size);
+	ROS_INFO("min range on back-left: %f", minBackLeft);
 	ROS_INFO("min range on front: %f", minFront);
-	ROS_INFO("min range on frontRight: %f", minFrontRight);
-	ROS_INFO("min range on right: %f", minRight);
+	ROS_INFO("min range on back-right: %f", minBackRight);
+
 }
 
 int main(int argc, char **argv)
